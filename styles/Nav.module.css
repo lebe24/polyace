@@ -1,0 +1,29 @@
+/* Link Hover */
+.hoverEffect {
+    transition: 0.35s;
+}
+.hoverEffect:hover {
+    text-shadow: 0 -1.05px 0 #fff, 0 2px 0 #30132b, 0 4px 0 #2c0d99,
+      0 6px 0 #701781, 0 8px 0 #2a105a, 0 10px 0 #2e0a42;
+}
+
+.text-logo-gradient {
+    background-color: --background-color;
+    background-image: radial-gradient(
+        at 4% 36%,
+        rgb(87, 44, 206) 0,
+        transparent 53%
+      ),
+      radial-gradient(at 100% 60%, rgb(107, 46, 206) 0, transparent 75%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.btn_shadow{
+    transition: 0.75s;
+}
+
+.btn_shadow:hover{
+    box-shadow: 0 0 10px #4f13ce, 0 0 20px #3e0b82, 0 0 20px 0 inset;
+}
+
