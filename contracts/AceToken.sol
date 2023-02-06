@@ -1,73 +1,36 @@
-// SPDX-License-Identifier: UNLICENSED
-pragma solidity ^0.8.9;
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.17;
 
-contract AceToken {
-    uint256 public totalSupply;
-    string public name = "AceToken";
-    string public symbol = "ACE";
-    string public standard = "Ace Token v1.0";
-    uint256 public decimals = 18;
+import "https://github.com/OpenZeppelin/openzeppelin-contracts/blob/v4.0.0/contracts/token/ERC20/ERC20.sol";
 
-    // events
-    event Transfer(address indexed _from, address indexed _to, uint256 _value);
-    event Approval(
-        address indexed _owner,
-        address indexed _spender,
-        uint256 _value
-    );
+contract MyToken is ERC20 {
 
-    // mappings
-    mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
-
-    constructor(uint256 _initialSupply) {
-        // set total supply
-        totalSupply = _initialSupply;
-        // owner will have all supply at first
-        balanceOf[address(this)] = _initialSupply;
+    address payable public owner;
+    // Price of 1 ace token
+    uint256 public price = 10000000000000000 ;
+    
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+        // Mint 100 tokens to msg.sender
+        // Similar to how
+        // 1 dollar = 100 cents
+        // 1 token = 1 * (10 ** decimals)
+         owner = payable(msg.sender);
+        _mint(address(this), 100 * 10 ** uint(decimals()));
     }
 
-    function transfer(address _to, uint256 _value)
-        public
-        returns (bool success)
-    {
-        require(
-            balanceOf[address(this)] >= _value,
-            "You do not have sufficient funds"
-        );
-        balanceOf[address(this)] -= _value;
-        balanceOf[_to] += _value;
-        emit Transfer(address(this), _to, _value);
+    function buyToken(address _recipient, uint256 _amount) payable public returns(bool){
+        require(msg.value >= ( price * _amount),"money is less");
+        _transfer(address(this), _recipient, _amount * 10 ** uint(decimals()));
         return true;
     }
 
-    function approve(address _spender, uint256 _value)
-        public
-        returns (bool success)
-    {
-        // allow account to how much value is approved
-        allowance[msg.sender][_spender] = _value;
-        emit Approval(msg.sender, _spender, _value);
-        return true;
-    }
+    function withdraw() public {
+        // get the amount of Ether stored in this contract
+        uint amount = address(this).balance;
 
-    function transferFrom(
-        address _from,
-        address _to,
-        uint256 _value
-    ) public returns (bool success) {
-        require(_value <= balanceOf[_from], "Value is less in @token");
-        require(
-            _value <= allowance[_from][msg.sender],
-            "Allowance value is less in @token"
-        );
-
-        balanceOf[_from] -= _value;
-        balanceOf[_to] += _value;
-
-        allowance[_from][msg.sender] -= _value;
-
-        emit Transfer(_from, _to, _value);
-        return true;
+        // send all Ether to owner
+        // Owner can receive Ether since the address of owner is payable
+        (bool success, ) = owner.call{value: amount}("");
+        require(success, "Failed to send Ether");
     }
 }
